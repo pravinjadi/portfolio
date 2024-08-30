@@ -1,10 +1,20 @@
 // Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
+const camera = new THREE.PerspectiveCamera(
+    getResponsiveFOV(), 
+    window.innerWidth / window.innerHeight, 
+    0.1, 
+    1000
+);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// Function to get responsive FOV
+function getResponsiveFOV() {
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    return aspectRatio < 1 ? 90 : 75; // Wider FOV on narrower screens
+}
 
 // Create a sphere geometry and material
 const sphereGeometry = new THREE.SphereGeometry(3.5, 64, 64);
@@ -66,10 +76,29 @@ document.addEventListener('keydown', (event) => {
     updateSphereRotation();
 });
 
-// Handle window resize
-window.addEventListener('resize', () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+// Handle touch controls for mobile devices
+document.addEventListener('touchstart', (event) => {
+    const touch = event.touches[0];
+    const halfWidth = window.innerWidth / 2;
+    const halfHeight = window.innerHeight / 2;
+
+    if (touch.clientX < halfWidth && touch.clientY < halfHeight) {
+        carTheta += 0.05; // Move forward
+    } else if (touch.clientX < halfWidth && touch.clientY >= halfHeight) {
+        carTheta -= 0.05; // Move backward
+    } else if (touch.clientX >= halfWidth && touch.clientY < halfHeight) {
+        carPhi += 0.05; // Turn left
+    } else if (touch.clientX >= halfWidth && touch.clientY >= halfHeight) {
+        carPhi -= 0.05; // Turn right
+    }
+
+    updateSphereRotation();
 });
 
+// Handle window resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.fov = getResponsiveFOV();
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
