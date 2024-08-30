@@ -1,16 +1,18 @@
 body {
     margin: 0;
     overflow: hidden;
+
 }
 
 canvas {
     display: block;
+    background-color: transparent;
 }
 
 .navbar {
-    padding-top: 30px;
+    padding-bottom: 30px;
     position: fixed;
-    top: 0;
+    bottom: 0;
     width: 100%;
     background-color: transparent;
     text-align: center;
